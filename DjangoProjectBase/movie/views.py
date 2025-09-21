@@ -2,11 +2,19 @@ from django.shortcuts import render
 from django.http import HttpResponse
 
 from .models import Movie
-
+import sys, os
 import matplotlib.pyplot as plt
 import matplotlib
 import io
 import urllib, base64
+from openai import OpenAI
+import numpy as np
+import os
+from dotenv import load_dotenv
+from django.shortcuts import render
+from django.conf import settings
+
+
 
 def home(request):
     #return HttpResponse('<h1>Welcome to Home Page</h1>')
@@ -18,6 +26,39 @@ def home(request):
     else:
         movies = Movie.objects.all()
     return render(request, 'home.html', {'searchTerm':searchTerm, 'movies':movies})
+
+
+def recommendationsSystem(request): 
+    prompt = request.GET.get('prompt')
+    recommended_movies = []
+
+    if prompt:
+        # ✅ Obtener el embedding del prompt
+        prompt_embedding = get_embedding(prompt)
+
+        # ✅ Cargar películas con embeddings
+        all_movies = Movie.objects.exclude(embedding__isnull=True)
+
+        similarities = []
+        for movie in all_movies:
+            try:
+                movie_embedding = np.frombuffer(movie.embedding, dtype=np.float32)
+                similarity = cosine_similarity(prompt_embedding, movie_embedding)
+                similarities.append((similarity, movie))
+            except Exception as e:
+                print(f"Error with movie {movie.title}: {e}")
+
+        # ✅ Ordenar películas por similitud
+        similarities.sort(reverse=True, key=lambda x: x[0])
+
+        # ✅ Tomar las top 5
+        recommended_movies = [movie for _, movie in similarities[:5]]
+        print(recommended_movies)
+
+    return render(request, 'recommendations.html', {
+        'prompt': prompt,
+        'recommended_movies': recommended_movies
+    })
 
 
 def about(request):
@@ -123,3 +164,20 @@ def generate_bar_chart(data, xlabel, ylabel):
     buffer.close()
     graphic = base64.b64encode(image_png).decode('utf-8')
     return graphic
+
+
+
+# ✅ Cargar la API key de OpenAI
+
+load_dotenv('../openAI.env')
+client = OpenAI(api_key=os.environ.get('openai_apikey'))
+
+# ✅ Función para generar embeddings
+def get_embedding(text, model="text-embedding-3-small"):
+    text = text.replace("\n", " ")
+    response = client.embeddings.create(input=[text], model=model)
+    return np.array(response.data[0].embedding, dtype=np.float32)
+
+# ✅ Función para similitud de coseno
+def cosine_similarity(a, b):
+    return np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b))

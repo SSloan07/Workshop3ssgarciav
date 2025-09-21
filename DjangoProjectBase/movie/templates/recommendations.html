@@ -1,0 +1,46 @@
+{% extends 'base.html' %} 
+{% block content %}
+
+<div class="container">
+    <h2 class="mt-4">¿What type of movie do you want to see ?</h2>
+
+    <form method="get" action="{% url 'recommendations' %}" class="mt-3">
+        <div class="mb-3">
+            <label for="prompt" class="form-label">Describe your dream movie:</label>
+            <input type="text" class="form-control" id="prompt" name="prompt" placeholder="Ej: Movie about a pianist in Europe"/>
+        </div>
+        <button type="submit" class="btn btn-success">Recommend</button>
+    </form>
+
+    {% if prompt %}
+        <hr>
+        <h4 class="mt-4">Results for: "<span class="text-primary">{{ prompt }}</span>"</h4>
+
+        {% if recommended_movies %}
+            <div class="row row-cols-1 row-cols-md-3 g-4 mt-3">
+                {% for movie in recommended_movies %}
+                    <div class="col">
+                        <div class="card h-100">
+                            {% if movie.image %}
+                                <img src="{{ movie.image.url }}" class="card-img-top" alt="{{ movie.title }}">
+                            {% endif %}
+                            <div class="card-body">
+                                <h5 class="card-title">{{ movie.title }}</h5>
+                                <p class="card-text">{{ movie.description}}</p>
+                                <p class="card-text"><strong>Género:</strong> {{ movie.genre }}</p>
+                                <p class="card-text"><strong>Año:</strong> {{ movie.year }}</p>
+                                {% if movie.url %}
+                                    <a href="{{ movie.url }}" class="btn btn-outline-primary" target="_blank">Ver más</a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted mt-3">No movies for that description.</p>
+        {% endif %}
+    {% endif %}
+</div>
+
+{% endblock content %}

@@ -27,9 +27,9 @@ class Command(BaseCommand):
         # ✅ Iterate through movies and generate embeddings
         for movie in movies:
             try:
-                emb = get_embedding(movie.description)
+                embedding = get_embedding(movie.description)
                 # ✅ Store embedding as binary in the database
-                movie.emb = emb.tobytes()
+                movie.embedding = embedding.tobytes()
                 movie.save()
                 self.stdout.write(self.style.SUCCESS(f"✅ Embedding stored for: {movie.title}"))
             except Exception as e:
