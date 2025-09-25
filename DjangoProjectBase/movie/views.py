@@ -169,11 +169,28 @@ def generate_bar_chart(data, xlabel, ylabel):
 
 # ✅ Cargar la API key de OpenAI
 
-load_dotenv('../openAI.env')
-client = OpenAI(api_key=os.environ.get('openai_apikey'))
+#load_dotenv('../openAI.env')
+#client = OpenAI(api_key=os.environ.get('openai_apikey'))
 
 # ✅ Función para generar embeddings
 def get_embedding(text, model="text-embedding-3-small"):
+    import os
+    from dotenv import load_dotenv
+    from openai import OpenAI
+    import numpy as np
+
+    # Cargar archivo .env (si no se ha hecho)
+    load_dotenv('../openAI.env')
+
+    # Obtener API key del entorno
+    api_key = os.getenv('openai_apikey')
+    if not api_key:
+        raise ValueError("❌ La variable de entorno 'openai_apikey' no está definida.")
+
+    # Crear cliente OpenAI
+    client = OpenAI(api_key=api_key)
+
+    # Limpiar el texto y obtener embeddings
     text = text.replace("\n", " ")
     response = client.embeddings.create(input=[text], model=model)
     return np.array(response.data[0].embedding, dtype=np.float32)
