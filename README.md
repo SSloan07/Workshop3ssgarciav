@@ -1,19 +1,11 @@
-# SOBRE LA EJECUCIÓN DE ESTE WORKSHOP
+# NOTAS SOBRE LA EJECUCIÓN DE ESTE WORKSHOP
 --- 
 1. Debe crearse en la raiz del proyecto un archivo titulado "openAI.env" 
 <img width="1918" height="44" alt="image" src="https://github.com/user-attachments/assets/2e7ef8c8-6bb7-4ce6-9d0a-7ceed72a56a6" />
 2. Dentro de él debe añadirse el siguiente contenido el siguiente contenido:
    openai_apikey="Aquí va la clave de openAI"
-<br/>
-<h2>Debe ejecutar los siguientes comandos</h2> 
-<br/>
-4. python3 -m venv venv
-<br/>
-5. source venv/bin/activate 
-<br/>
-6. cd DjangoProjectBase
-<br/>
-7. python manage.py runserver
+<br/> 
+
 
 
 
